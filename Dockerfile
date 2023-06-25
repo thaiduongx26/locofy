@@ -6,8 +6,11 @@ RUN pip install -r requirements.txt
 RUN mkdir locofy && cd locofy
 COPY . /locofy/
 
-RUN dvc pull -f
-
 WORKDIR /locofy
 
-CMD [ "python", "run.py", "--port", "4000" ]
+ENV GIT_PYTHON_REFRESH=quiet
+RUN dvc pull
+
+EXPOSE 8003
+
+CMD [ "python", "run.py", "--port", "8003" ]
