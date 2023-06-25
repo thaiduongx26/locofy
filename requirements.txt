@@ -8,3 +8,5 @@ torchvision==0.15.1
 tqdm==4.65.0
 seqeval
 dvc-s3
+uvicorn[standard]==0.15.0
+fastapi[all]==0.75.2
