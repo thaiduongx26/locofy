@@ -44,4 +44,32 @@ Because each sample only has 1 direction, we don't have the height in the case o
 ### Model architecture
 Firstly, for each element in the sequence, I create an embedding layer for each feature and get the sum of them, so after that, we have an embedding present for an element. For the model, I use a small transformer encoder model combined with Sequence Labeling Head. For the metric, I used entity exact match level to calculate the accuracy and f1-score, it means a group was wrong if that group contain more or less objects, even only 1.
 
-![alt text]([http://url/to/img.png](https://github.com/thaiduongx26/locofy/blob/main/doc_images/locofy_model%20(1).png)https://github.com/thaiduongx26/locofy/blob/main/doc_images/locofy_model%20(1).png)
+<img src="https://github.com/thaiduongx26/locofy/blob/main/doc_images/locofy_model%20(1).png" width=60% height=60%/>
+
+### Training strategy
+- I create 5 folds of data, each fold contains 80% data for training and 20% for testing. Then I got 5 models based on 5 folds and another model trained on full data. In total, we have 6 models.
+- For inference, I ensemble all of them by calculating the mean of logit.
+<img src="https://github.com/thaiduongx26/locofy/blob/main/doc_images/pipeline.png" width=75% height=75%>
+
+### Some results
+|   |Precision|Recall|F1-score|n_groups|
+|---|:---:|:---:|:---:|:---:|
+| **Fold-0**  |0.9444911690496215|0.9468802698145026|0.9456842105263158|1186|
+| **Fold-1**  |0.9649280575539568|0.9503985828166519|0.9576082106202588|1129|
+| **Fold-2**  |0.9658119658119658|0.9625212947189097|0.9641638225255974|1174|
+| **Fold-3**  |0.9582971329278888|0.9395229982964225|0.9488172043010752|1174|
+| **Fold-4**  |0.9743150684931506|0.9619611158072696|0.968098681412165|1183|
+
+# Some ideas
+- I don't know why this data only follow 1 direction but I see we have the images, we have the positions, and it's the websites so we can crawl a lot of data. Some important features that we can explore like width, height, the distance between 2 centers of 2 objects, image features (we can see 2 objects relevant or not based on content in image), text features, etc
+- Following my approach, there are some ways to improve if I have more time to focus:
+  - Applying rules-based for some special cases like objects have size = 0 or set threshold for the ratio of size and space between 2 objects.
+  - Investigate more about rescale to choose the better ratio to remove the noise of space between 2 objects.
+  - Tunning the params of the model focuses on the num_heads and the num_layers of the encoder, increases the batch size and tuning the dropout layer to avoid overfitting.
+ 
+- Some other approaches ideas:
+  - Using detection pre-trained models as the backbone, it has a better measure of the correlation between two objects, both distance and visualization.
+  - Combining image embedding and position embedding (or maybe content embedding if we have), it can help to build a graph that maps every object in the webpage. After that we can group the objects.
+  - I am not really sure about can we extract the label of each element in the website or not, but I think most websites follow some limited structures (it's large, but I think it's still limited), for example, a group of buttons in the login/register section, something like that. If it is feasible, I think it's possible to pre-train a model that can perform better for this specific downstream task.
+
+## Thank you for reading
